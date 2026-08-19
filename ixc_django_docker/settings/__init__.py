@@ -3,6 +3,8 @@ import os
 from django.core.exceptions import ImproperlyConfigured
 from split_settings.tools import include, optional
 
+from ixc_django_docker.template_settings import apply_legacy_template_settings
+
 
 def _(module, from_dir):
     relpath = os.path.relpath(
@@ -93,6 +95,11 @@ else:
 # Include base and project settings modules.
 include(*BASE_SETTINGS)
 include(*PROJECT_SETTINGS)
+
+# Django 1.8 and 1.9 prefer `TEMPLATES` over the legacy template settings.
+# Apply legacy values after project settings have been included so existing
+# projects can keep customising them while retaining other template backends.
+apply_legacy_template_settings(globals(), django.VERSION)
 
 # Create missing runtime directories.
 for dirname in RUNTIME_DIRS:
